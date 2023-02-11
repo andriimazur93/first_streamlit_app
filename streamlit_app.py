@@ -18,16 +18,17 @@ streamlit.dataframe(fruits_to_show)
 
 # New section to display fruityvice api response
 streamlit.title('Fruityvice Fruit Advice!')
-fruit_choice = streamlit.text_input('What fruit would you like information about?', 'Kiwi')
-streamlit.write('The user entered', fruit_choice)
 
-fruityvice_response = requests.get(f"https://fruityvice.com/api/fruit/{fruit_choice}")
-
-# take the json version of the response and normalize it
-fruityvice_normalized = pd.json_normalize(fruityvice_response.json())
-
-# output it the screen as a table
-streamlit.dataframe(fruityvice_normalized)
+try:
+    fruit_choice = streamlit.text_input('What fruit would you like information about?')
+    if not fruit_choice:
+        streamlit.error("Please select a fruit to get information.")
+     else:
+        fruityvice_response = requests.get(f"https://fruityvice.com/api/fruit/{fruit_choice}")
+        fruityvice_normalized = pd.json_normalize(fruityvice_response.json())
+        streamlit.dataframe(fruityvice_normalized)
+except URLError as e:
+    estreamlit.error()
 
 my_cnx = snowflake.connector.connect(**streamlit.secrets["snowflake"])
 my_cur = my_cnx.cursor()
